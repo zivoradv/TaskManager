@@ -107,6 +107,7 @@ const CreateTask = () => {
               value={task.due_date}
               onChange={handleChange}
             />
+            <p>*If not defined it will fill in current time and date.</p>
           </div>
           <button type="submit" className="submit-button">
             Create Task

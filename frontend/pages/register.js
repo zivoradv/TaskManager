@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Header from '@/components/header'
+import { toast } from 'react-toastify';
 function login() {
     const [formData, setFormData] = useState({
         email: '',
@@ -42,9 +43,10 @@ function login() {
           })
           .then((data) => {
             console.log('User created successfully:', data);
+            toast.success('User created successfully:', data)
           })
           .catch((error) => {
-            console.error('Error creating user:', error);
+            toast.error('Error creating user:', error);
           });
       };
 

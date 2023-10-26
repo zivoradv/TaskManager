@@ -9,7 +9,7 @@ function Profile() {
 
   useEffect(() => {
     const username = Cookies.get('username');
-
+    if(username){
     fetch(`http://localhost:5000/user/${username}`)
       .then((response) => {
         if (response.ok) {
@@ -24,6 +24,7 @@ function Profile() {
       .catch((error) => {
         console.error('Error fetching user information:', error);
       });
+    }
   }, []);
 
   const handleLogOut = () => {

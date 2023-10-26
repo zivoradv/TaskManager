@@ -1,5 +1,6 @@
 const db = require('../server');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const getAllTasks = (req, res) => {
   const sql = 'SELECT * FROM tasks';
@@ -105,18 +106,36 @@ const createTaskByUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { username, password, is_admin, email } = req.body;
-  const sql = 'INSERT INTO users (username, password, is_admin, last_login_date, email) VALUES (?, ?, ?, now(), ?)';
-  const values = [username, password, is_admin, email];
-
-  req.db.query(sql, values, (err, results) => {
+  
+  // Generate a salt
+  bcrypt.genSalt(10, (err, salt) => {
     if (err) {
       console.error(err);
-      res.status(500).json({ error: 'An error occurred while creating the user.' });
-    } else {
-      res.status(201).json({ message: 'User created successfully' });
+      return res.status(500).json({ error: 'An error occurred while creating the user.' });
     }
+
+    // Hash the password with the generated salt
+    bcrypt.hash(password, salt, (err, hash) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'An error occurred while creating the user.' });
+      }
+      
+      // Store the hashed password and salt in the database
+      const sql = 'INSERT INTO users (username, password, is_admin, last_login_date, email) VALUES (?, ?, ?, now(), ?)';
+      const values = [username, hash, is_admin, email];
+
+      req.db.query(sql, values, (err, results) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'An error occurred while creating the user.' });
+        }
+        res.status(201).json({ message: 'User created successfully' });
+      });
+    });
   });
 };
+
 
 const login = (req, res) => {
   const { username, password } = req.body;
@@ -125,27 +144,32 @@ const login = (req, res) => {
   req.db.query(checkUserQuery, [username], (err, userResults) => {
     if (err) {
       console.error(err);
-      res.status(500).json({ error: 'An error occurred while checking user existence.' });
+      return res.status(500).json({ error: 'An error occurred while checking user existence.' });
     } else if (userResults.length === 0) {
-      res.status(401).json({ error: 'User not found' });
-    } else {
-      const storedPassword = userResults[0].password; 
-      if (password !== storedPassword) {
-        res.status(401).json({ error: 'Incorrect password' });
-      } else {
-        const updateLastLoginQuery = 'UPDATE users SET last_login_date = NOW() WHERE username = ?';
-        req.db.query(updateLastLoginQuery, [username], (err, updateResults) => {
-          if (err) {
-            console.error(err);
-            res.status(500).json({ error: 'An error occurred while updating last login time.' });
-          } else {
-            res.status(200).json({ message: 'Login successful' });
-          }
-        });
-      }
+      return res.status(401).json({ error: 'User not found' });
     }
+
+    const storedPassword = userResults[0].password; 
+
+    // Compare the provided password with the hashed password
+    bcrypt.compare(password, storedPassword, (err, isMatch) => {
+      if (err || !isMatch) {
+        return res.status(401).json({ error: 'Incorrect password' });
+      }
+
+      // Password is correct; you can proceed with user authentication actions.
+      const updateLastLoginQuery = 'UPDATE users SET last_login_date = NOW() WHERE username = ?';
+      req.db.query(updateLastLoginQuery, [username], (err, updateResults) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'An error occurred while updating last login time.' });
+        }
+        res.status(200).json({ message: 'Login successful' });
+      });
+    });
   });
 };
+
 
 const setTaskStatus = (req, res) => {
   const taskId = req.params.id;
