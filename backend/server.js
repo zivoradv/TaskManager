@@ -39,12 +39,14 @@ app.post('/login/', taskRoute.login);
 app.get('/user/:username', taskRoute.getUser);
 app.get('/tasks/:username', taskRoute.getTasksByUser);
 app.put('/tasks/setStatus/:id', taskRoute.setTaskStatus);
+app.put('/tasks/:id', taskRoute.updateTask);
 
 // TEMP TASKS
 app.post('/tempTasks/', taskRoute.createTempTask);
 app.delete('/tempTasks/:id', taskRoute.deleteTempTask);
 app.get('/tempTasks', taskRoute.getTempTasks);
 app.put('/tempTasks/setStatus/:id', taskRoute.setTempTaskStatus);
+app.put('/tempTasks/:id', taskRoute.updateTempTask);
 
 const port = process.env.PORT || 5000;
 

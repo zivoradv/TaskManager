@@ -281,6 +281,45 @@ const setTempTaskStatus = (req, res) => {
   });
 };
 
+const updateTempTask = (req, res) => {
+  const taskId = req.params.id;
+  const { title, description } = req.body;
+
+  const sql = `
+    UPDATE temp_tasks
+    SET title = '${title}', description = '${description}'
+    WHERE id = ${taskId}
+  `;
+
+  req.db.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while updating the temporary task.' });
+    } else {
+      res.status(200).json({ message: 'Temporary task updated successfully' });
+    }
+  });
+};
+
+const updateTask = (req, res) => {
+  const taskId = req.params.id;
+  const { title, description } = req.body;
+
+  const sql = `
+    UPDATE tasks
+    SET title = '${title}', description = '${description}'
+    WHERE id = ${taskId}
+  `;
+
+  req.db.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred while updating the temporary task.' });
+    } else {
+      res.status(200).json({ message: 'Temporary task updated successfully' });
+    }
+  });
+};
 
 module.exports = {
   getAllTasks,
@@ -295,5 +334,7 @@ module.exports = {
   getTempTasks,
   createTempTask,
   setTempTaskStatus,
-  setTaskStatus
+  setTaskStatus,
+  updateTempTask,
+  updateTask
 };

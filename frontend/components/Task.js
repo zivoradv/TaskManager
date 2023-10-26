@@ -1,12 +1,16 @@
-import React, { useContext } from "react";
-import axios from "axios";
+import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
-import { FaTrash, FaCheck, FaTimes } from "react-icons/fa";
+import { FaTrash, FaCheck, FaTimes, FaPen } from "react-icons/fa";
 import { TaskContext } from "@/context/TaskContext";
+import EditTask from "@/pages/editTask";
 
 const Task = ({ task, index }) => {
-  const { deleteTask, setTaskStatus } = useContext(TaskContext);
+  const { deleteTask, setTaskStatus, updateTask } = useContext(TaskContext);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
 
   const handleDelete = async () => {
     try {
@@ -46,7 +50,17 @@ const Task = ({ task, index }) => {
           />
         )}
         <FaTrash className="delete-button" onClick={handleDelete} />
+        <FaPen className="edit-button" onClick={handleEdit} />
       </div>
+
+      {isEditing && (
+        <EditTask
+          task={task}
+          isOpen={isEditing}
+          onRequestClose={() => setIsEditing(false)}
+          onSave={updateTask}
+        />
+      )}
     </div>
   );
 };

@@ -3,8 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/login": "pages/login.js",
-  "/createTask": "pages/createTask.js",
-  "/": "pages/index.js",
   "/profile": "pages/profile.js",
-  "/register": "pages/register.js"
+  "/": "pages/index.js",
+  "/register": "pages/register.js",
+  "/createTask": "pages/createTask.js"
 }

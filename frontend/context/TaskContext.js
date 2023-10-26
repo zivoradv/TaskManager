@@ -74,6 +74,51 @@ export const TaskContextProvider = ({ children }) => {
   }
   };
 
+  const updateTask = async (taskId, updatedData) => {
+    const username = Cookies.get('username');
+    
+    if(!username){
+      try {
+        const url = `http://localhost:5000/tempTasks/${taskId}`;
+    
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error updating task:", error);
+      }
+    }
+    else{
+      try {
+        const url = `http://localhost:5000/tasks/${taskId}`;
+    
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error updating task:", error);
+      }
+    }
+      fetchTasks();   
+  };
+
+  
   const setTaskStatus = async (TaskId) => {
     const username = Cookies.get('username');
 
@@ -116,7 +161,7 @@ export const TaskContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <TaskContext.Provider value={{ tasks, deleteTask, setTaskStatus }}>
+    <TaskContext.Provider value={{ tasks, deleteTask, setTaskStatus, updateTask }}>
       {children}
     </TaskContext.Provider>
   );
