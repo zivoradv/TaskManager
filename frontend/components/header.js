@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import '@/styles/styles.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Head from 'next/head';
 
 const Header = () => {
   const [loggedInUsername, setLoggedInUsername] = useState(null);
@@ -18,6 +19,9 @@ const Header = () => {
 
   return (
     <header className="header">
+      <Head>
+        <title>Task Manager application</title>
+      </Head>
       <nav>
         <ul className="nav">
           <li className="nav-item">

@@ -2,18 +2,16 @@ import TaskList from "@/components/TaskList";
 import React from "react";
 import Header from "@/components/header";
 import { TaskContextProvider } from "@/context/TaskContext";
-import '../styles/styles.css'
-import CreateTask from "./createTask";
+import "../styles/styles.css";
 
 const TaskManager = () => {
   return (
     <TaskContextProvider>
       <div className="app">
-      <Header />
-      <TaskList />
-    </div>
+        <Header />
+        <TaskList />
+      </div>
     </TaskContextProvider>
-    
   );
 };
 

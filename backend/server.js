@@ -40,6 +40,7 @@ app.get('/user/:username', taskRoute.getUser);
 app.get('/tasks/:username', taskRoute.getTasksByUser);
 app.put('/tasks/setStatus/:id', taskRoute.setTaskStatus);
 app.put('/tasks/:id', taskRoute.updateTask);
+app.get('/tasks/count/:username', taskRoute.numberOfTasksByUser);
 
 // TEMP TASKS
 app.post('/tempTasks/', taskRoute.createTempTask);
