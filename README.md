@@ -41,6 +41,8 @@ The Task Manager application offers a range of pages to cater to various user fu
 
 - **View Task Page**: This page displays a list of tasks, either for all users or, when logged in, for the specific user.
 
+- **Calendar**: Users can preview the dates and see highlighted, important dates.
+
 - **Create Task Page**: Users can create new tasks on this page, specifying the title, description, and due date.
 
 - **Registration Page**: This is where users can register with the application, creating their accounts.
@@ -54,4 +56,7 @@ The Task Manager application offers a range of pages to cater to various user fu
 To get started with the Task Manager application, follow these simple steps:
 
 1. Clone this repository to your local machine.
-2. Install the required dependencies using your preferred package manager (e.g., npm or yarn). Use the following command to install dependencies:
+2. Install the required dependencies using your preferred package manager (e.g., npm or yarn). Use the following command to install dependencies.
+3. Go to backend folder (cd ./backend), run `npm start`.
+4. Open new terminal (click on the "+" sign)
+5. Go to frontend folder (cd ./frontend), run `npm run dev`.
