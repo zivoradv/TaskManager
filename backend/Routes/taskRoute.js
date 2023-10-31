@@ -19,8 +19,8 @@ const getAllTasks = (req, res) => {
 const getTasksByUser = (req, res) => {
   const username = req.params.username;
 
-  const sql =
-    "SELECT tasks.id, tasks.title, tasks.description, tasks.due_date, tasks.status FROM tasks INNER JOIN users ON tasks.user_id = users.id WHERE users.username = ?";
+  const sql = `SELECT tasks.id, tasks.title, tasks.description, due_date, tasks.status FROM tasks INNER JOIN users ON tasks.user_id = users.id WHERE users.username = "${username}"`;
+
   req.db.query(sql, [username], (err, results) => {
     if (err) {
       console.error(err);
@@ -28,7 +28,22 @@ const getTasksByUser = (req, res) => {
         .status(500)
         .json({ error: "An error occurred while fetching tasks." });
     } else {
-      res.status(200).json(results);
+      // Since the date is now formatted as formatted_due_date, adjust the response accordingly
+      const formattedResults = results.map((task) => {
+        // Format the due_date if it's not null
+        const formattedDate = task.due_date
+          ? new Date(task.due_date).toLocaleDateString("en-US")
+          : null;
+        return {
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          due_date: formattedDate, // Use the formatted date
+          status: task.status,
+          user_id: task.user_id,
+        };
+      });
+      res.status(200).json(formattedResults);
     }
   });
 };
@@ -99,9 +114,19 @@ const createTaskByUser = (req, res) => {
     } else {
       const userId = userResults[0].id;
 
+      let formattedDueDate = due_date; // Initialize with the input due_date value
+
+      // Check if due_date is provided and format it as needed
+      if (!due_date) {
+        formattedDueDate = new Date().toISOString().slice(0, 10); // If due_date not provided, use current date
+      } else {
+        formattedDueDate = new Date(due_date).toISOString().slice(0, 10); // Convert to YYYY-MM-DD format
+        // You might consider using libraries like Moment.js to format dates more precisely
+      }
+
       const createTaskQuery =
-        "INSERT INTO tasks (user_id, title, description, due_date) VALUES (?, ?, ?, NOW())";
-      const taskValues = [userId, title, description, due_date];
+        "INSERT INTO tasks (user_id, title, description, due_date) VALUES (?, ?, ?, ?)";
+      const taskValues = [userId, title, description, formattedDueDate];
 
       req.db.query(createTaskQuery, taskValues, (taskErr, taskResults) => {
         if (taskErr) {

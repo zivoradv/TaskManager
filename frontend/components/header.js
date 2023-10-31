@@ -30,6 +30,11 @@ const Header = () => {
             </Link>
           </li>
           <li className="nav-item">
+            <Link href="/calendar" className="link">
+              <button className='header-button'>Calendar</button>
+            </Link>
+          </li>
+          <li className="nav-item">
             <Link href="/createTask" className="link">
               <button className='header-button'>Create Task</button>
             </Link>

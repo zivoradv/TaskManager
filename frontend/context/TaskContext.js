@@ -1,18 +1,17 @@
-import React, { createContext, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
+import React, { createContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
 export const TaskContext = createContext();
 
 export const TaskContextProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
 
   const fetchTasks = async () => {
+    const username = Cookies.get("username");
 
-    const username = Cookies.get('username');
-
-    if(!username){
+    if (!username) {
       try {
         const response = await fetch("http://localhost:5000/tempTasks");
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -21,16 +20,26 @@ export const TaskContextProvider = ({ children }) => {
       } catch (error) {
         console.error("Error:", error);
       }
-    }
-    else{
+    } else {
       try {
         const response = await fetch(`http://localhost:5000/tasks/${username}`);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        setTasks(data);
+        const formattedTasks = data.map(task => {
+          // Check if due_date is null
+          if (task.due_date) {
+            // Transform the due_date format
+            const formattedDate = new Date(task.due_date).toLocaleDateString('en-US');
+            return { ...task, due_date: formattedDate };
+          } else {
+            // If due_date is null, set it to a specific value
+            return { ...task, due_date: 'null' }; // or set it to any other null indicator
+          }
+        });
+        setTasks(formattedTasks);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -38,75 +47,74 @@ export const TaskContextProvider = ({ children }) => {
   };
 
   const deleteTask = async (TaskId) => {
-    const username = Cookies.get('username');
+    const username = Cookies.get("username");
 
-    if(!username){
-    try {
-      const response = await fetch(`http://localhost:5000/tempTasks/${TaskId}`, 
-      {
-        method: "DELETE",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!username) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/tempTasks/${TaskId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        fetchTasks();
+      } catch (error) {
+        console.error("Error:", error);
       }
+    } else {
+      try {
+        const response = await fetch(`http://localhost:5000/tasks/${TaskId}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-      fetchTasks();
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-  else{
-    try {
-      const response = await fetch(`http://localhost:5000/tasks/${TaskId}`, 
-      {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        fetchTasks();
+      } catch (error) {
+        console.error("Error:" + " " + tempTaskId, error);
       }
-
-      fetchTasks();
-    } catch (error) {
-      console.error("Error:" + " " + tempTaskId, error);
     }
-  }
   };
 
   const updateTask = async (taskId, updatedData) => {
-    const username = Cookies.get('username');
-    
-    if(!username){
+    const username = Cookies.get("username");
+
+    if (!username) {
       try {
         const url = `http://localhost:5000/tempTasks/${taskId}`;
-    
+
         const response = await fetch(url, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(updatedData),
         });
-    
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
       } catch (error) {
         console.error("Error updating task:", error);
       }
-    }
-    else{
+    } else {
       try {
         const url = `http://localhost:5000/tasks/${taskId}`;
-    
+
         const response = await fetch(url, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(updatedData),
         });
-    
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -114,45 +122,47 @@ export const TaskContextProvider = ({ children }) => {
         console.error("Error updating task:", error);
       }
     }
-      fetchTasks();   
+    fetchTasks();
   };
 
-  
   const setTaskStatus = async (TaskId) => {
-    const username = Cookies.get('username');
+    const username = Cookies.get("username");
 
-    if(!username){
-    try {
-      const response = await fetch(`http://localhost:5000/tempTasks/setStatus/${TaskId}`, 
-      {
-        method: "PUT",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!username) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/tempTasks/setStatus/${TaskId}`,
+          {
+            method: "PUT",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        fetchTasks();
+      } catch (error) {
+        console.error("Error:", error);
       }
+    } else {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/tasks/setStatus/${TaskId}`,
+          {
+            method: "PUT",
+          }
+        );
 
-      fetchTasks();
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-  else{
-    try {
-      const response = await fetch(`http://localhost:5000/tasks/setStatus/${TaskId}`, 
-      {
-        method: "PUT",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        fetchTasks();
+      } catch (error) {
+        console.error("Error:", error);
       }
-
-      fetchTasks();
-    } catch (error) {
-      console.error("Error:", error);
     }
-  }
   };
 
   useEffect(() => {
@@ -160,7 +170,9 @@ export const TaskContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <TaskContext.Provider value={{ tasks, deleteTask, setTaskStatus, updateTask }}>
+    <TaskContext.Provider
+      value={{ tasks, deleteTask, setTaskStatus, updateTask }}
+    >
       {children}
     </TaskContext.Provider>
   );
