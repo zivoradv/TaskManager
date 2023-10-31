@@ -324,3 +324,9 @@ select {
 .completed-button:hover {
   color: #315a33;
 }
+
+
+/*calendar.css */
+.calendar{
+  width:80vw;
+}

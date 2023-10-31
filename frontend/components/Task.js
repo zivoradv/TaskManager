@@ -29,7 +29,6 @@ const Task = ({ task, index }) => {
 
   return (
     <div className={task.status ? "status-tast" : "task"}>
-      <h3 className="task-title">{index + 1}.</h3>
       <h3 className="task-title">{task.title}</h3>
       <p className="task-description">{task.description}</p>
       <p className="task-due-date">Due Date: {task.due_date}</p>

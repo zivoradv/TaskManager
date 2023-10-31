@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import Cookies from "js-cookie";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-
+import "@/styles/styles.css"
 const TaskCalendar = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -13,17 +13,23 @@ const TaskCalendar = () => {
   const username = Cookies.get("username");
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/tasks/${username}`);
-        const data = await response.json();
-        setTasks(data);
+        if (username) {
+          const response = await fetch(`http://localhost:5000/tasks/${username}`);
+          const data = await response.json();
+          setTasks(data);
+        } else {
+          const response = await fetch(`http://localhost:5000/tempTasks`);
+          const data = await response.json();
+          setTasks(data);
+        }
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
     };
 
-    fetchTasks();
+    fetchData();
   }, [username]);
 
   const taskDates = tasks.map((task) => new Date(task.due_date).toDateString());
@@ -132,6 +138,7 @@ const TaskCalendar = () => {
             onChange={onChange}
             value={selectedDate}
             tileContent={tileContent}
+            className="calendar"
           />
           <Tooltip anchorSelect=".my-anchor-element">{tooltipContent}</Tooltip>
         </div>

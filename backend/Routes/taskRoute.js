@@ -28,9 +28,7 @@ const getTasksByUser = (req, res) => {
         .status(500)
         .json({ error: "An error occurred while fetching tasks." });
     } else {
-      // Since the date is now formatted as formatted_due_date, adjust the response accordingly
       const formattedResults = results.map((task) => {
-        // Format the due_date if it's not null
         const formattedDate = task.due_date
           ? new Date(task.due_date).toLocaleDateString("en-US")
           : null;
@@ -38,7 +36,7 @@ const getTasksByUser = (req, res) => {
           id: task.id,
           title: task.title,
           description: task.description,
-          due_date: formattedDate, // Use the formatted date
+          due_date: formattedDate, 
           status: task.status,
           user_id: task.user_id,
         };
@@ -114,14 +112,12 @@ const createTaskByUser = (req, res) => {
     } else {
       const userId = userResults[0].id;
 
-      let formattedDueDate = due_date; // Initialize with the input due_date value
+      let formattedDueDate = due_date; 
 
-      // Check if due_date is provided and format it as needed
       if (!due_date) {
-        formattedDueDate = new Date().toISOString().slice(0, 10); // If due_date not provided, use current date
+        formattedDueDate = new Date().toISOString().slice(0, 10); 
       } else {
-        formattedDueDate = new Date(due_date).toISOString().slice(0, 10); // Convert to YYYY-MM-DD format
-        // You might consider using libraries like Moment.js to format dates more precisely
+        formattedDueDate = new Date(due_date).toISOString().slice(0, 10); 
       }
 
       const createTaskQuery =
@@ -145,7 +141,6 @@ const createTaskByUser = (req, res) => {
 const createUser = (req, res) => {
   const { username, password, is_admin, email } = req.body;
 
-  // Generate a salt
   bcrypt.genSalt(10, (err, salt) => {
     if (err) {
       console.error(err);
@@ -154,7 +149,6 @@ const createUser = (req, res) => {
         .json({ error: "An error occurred while creating the user." });
     }
 
-    // Hash the password with the generated salt
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) {
         console.error(err);
@@ -163,7 +157,6 @@ const createUser = (req, res) => {
           .json({ error: "An error occurred while creating the user." });
       }
 
-      // Store the hashed password and salt in the database
       const sql =
         "INSERT INTO users (username, password, is_admin, last_login_date, email) VALUES (?, ?, ?, now(), ?)";
       const values = [username, hash, is_admin, email];
@@ -197,13 +190,11 @@ const login = (req, res) => {
 
     const storedPassword = userResults[0].password;
 
-    // Compare the provided password with the hashed password
     bcrypt.compare(password, storedPassword, (err, isMatch) => {
       if (err || !isMatch) {
         return res.status(401).json({ error: "Incorrect password" });
       }
 
-      // Password is correct; you can proceed with user authentication actions.
       const updateLastLoginQuery =
         "UPDATE users SET last_login_date = NOW() WHERE username = ?";
       req.db.query(updateLastLoginQuery, [username], (err, updateResults) => {
@@ -260,23 +251,28 @@ const setTaskStatus = (req, res) => {
 //TEMP TASKS
 
 const createTempTask = (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, due_date } = req.body;
 
-  const sql =
-    "INSERT INTO temp_tasks (title, description, due_date) VALUES (?, ?, NOW())";
-  const values = [title, description];
+  let sql, values;
+
+  if (due_date) {
+    sql = "INSERT INTO temp_tasks (title, description, due_date) VALUES (?, ?, ?)";
+    values = [title, description, due_date];
+  } else {
+    sql = "INSERT INTO temp_tasks (title, description, due_date) VALUES (?, ?, NOW())";
+    values = [title, description];
+  }
 
   req.db.query(sql, values, (err, results) => {
     if (err) {
       console.error(err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while creating a temporary task." });
+      res.status(500).json({ error: "An error occurred while creating a temporary task." });
     } else {
       res.status(201).json({ message: "Temporary task created successfully" });
     }
   });
 };
+
 
 const deleteTempTask = (req, res) => {
   const taskId = req.params.id;
@@ -300,14 +296,25 @@ const getTempTasks = (req, res) => {
   req.db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
-      res
-        .status(500)
-        .json({ error: "An error occurred while fetching temporary tasks." });
+      res.status(500).json({ error: "An error occurred while fetching temporary tasks." });
     } else {
-      res.status(200).json(results);
+      const formattedResults = results.map((task) => {
+        const formattedDate = task.due_date
+          ? new Date(task.due_date).toLocaleDateString("en-US")
+          : null;
+        return {
+          id: task.id,
+          title: task.title,
+          description: task.description,
+          due_date: formattedDate,
+          status: task.status
+        };
+      });
+      res.status(200).json(formattedResults);
     }
   });
 };
+
 
 const setTempTaskStatus = (req, res) => {
   const taskId = req.params.id;
