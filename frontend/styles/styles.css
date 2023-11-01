@@ -330,3 +330,44 @@ select {
 .calendar{
   width:80vw;
 }
+
+.task-list-container {
+  margin: 20px;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.search-section {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  width: 100%;
+}
+
+input[type="text"],
+select {
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.sort-by-label {
+  margin-right: 10px;
+  border: 2px solid gray;
+  border-radius: 15px;
+  padding: 2px 20px;
+  width: 140px;
+  background-color: white;
+}
+
+.task-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 4px;
+}
+
